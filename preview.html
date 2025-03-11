@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview - Snapix - Screenshots in One Snap</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      background: #1E1E2E;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #2b5876, #4e4376);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .preview-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow: auto;
+    }
+    
+    .screenshot-preview {
+      max-width: 90%;
+      max-height: 70vh;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .canvas-container {
+      position: relative;
+      margin: 20px 0;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      display: none; /* 初始隐藏，激活编辑模式时显示 */
+    }
+    
+    #editCanvas {
+      display: block;
+      max-width: 90%;
+      max-height: 70vh;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(to right, #12c2e9, #c471ed);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .btn-danger {
+      background: linear-gradient(to right, #f64f59, #c471ed);
+      color: white;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .footer {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .footer a {
+      color: #c471ed;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .edit-tools {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+    }
+    
+    .tool-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    
+    .tool-btn.active {
+      background: #c471ed;
+    }
+    
+    .color-picker {
+      display: none;
+      margin-left: 10px;
+    }
+    
+    .edit-active .color-picker {
+      display: block;
+    }
+    
+    .edit-mode-controls {
+      display: none;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    
+    .edit-active .edit-mode-controls {
+      display: flex;
+    }
+    
+    /* 添加语言选择器样式 */
+    .language-selector {
+      z-index: 100;
+    }
+    
+    .language-selector select {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .language-selector select:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* 添加加载状态样式 */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #c471ed;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 无截图状态样式 */
+    .no-screenshot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      width: 100%;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 18px;
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+    
+    .no-screenshot-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 data-i18n="preview">Preview - Snapix - Screenshots in One Snap</h1>
+    
+    <div class="actions">
+      <button id="btnDiscard" class="btn btn-secondary">
+        <span data-i18n="cancel">Cancel</span>
+      </button>
+      <button id="btnSaveAs" class="btn btn-primary">
+        <span data-i18n="saveAs">Save As...</span>
+      </button>
+      <button id="btnSave" class="btn btn-primary">
+        <span data-i18n="save">Save</span>
+      </button>
+      <div class="language-selector">
+        <select id="languageSelector">
+          <option value="en">English</option>
+          <option value="zh-CN">简体中文</option>
+          <option value="ja">日本語</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+    </div>
+  </header>
+  
+  <div class="preview-container">
+    <div class="edit-tools">
+      <button class="tool-btn" id="btnRect" data-i18n-title="edit.rectangle" title="Rectangle">□</button>
+      <button class="tool-btn" id="btnArrow" data-i18n-title="edit.arrow" title="Arrow">→</button>
+      <button class="tool-btn" id="btnText" data-i18n-title="edit.text" title="Text">T</button>
+      <button class="tool-btn" id="btnMosaic" data-i18n-title="edit.mosaic" title="Mosaic">▒</button>
+      <button class="tool-btn" id="btnCrop" data-i18n-title="edit.crop" title="Crop">✂</button>
+      <input type="color" id="colorPicker" class="color-picker" value="#ff0000">
+      
+      <div class="edit-mode-controls">
+        <button id="btnApplyEdit" class="btn btn-primary" data-i18n="edit.applyEdit">Apply Edit</button>
+        <button id="btnCancelEdit" class="btn btn-secondary" data-i18n="edit.cancelEdit">Cancel Edit</button>
+      </div>
+    </div>
+    
+    <!-- 加载状态 -->
+    <div id="loadingContainer" class="loading-container">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" data-i18n="loading">Loading screenshot...</div>
+    </div>
+    
+    <!-- 无截图状态 -->
+    <div id="noScreenshotContainer" class="no-screenshot" style="display: none;">
+      <div class="no-screenshot-icon">📷</div>
+      <div data-i18n="noScreenshot">No screenshot available</div>
+    </div>
+    
+    <!-- 原始截图预览 -->
+    <img id="screenshotImg" class="screenshot-preview" alt="Screenshot Preview" style="display: none;">
+    
+    <!-- 编辑用画布 -->
+    <div class="canvas-container">
+      <canvas id="editCanvas"></canvas>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p><a href="https://www.gezicode.cn" target="_blank">Official Website</a> | QQ: 312549912 | Wechat: overabel</p>
+  </div>
+  
+  <script src="languages.js"></script>
+  <script src="preview.js"></script>
+</body>
+</html>

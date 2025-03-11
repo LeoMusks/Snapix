@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Snapix - Screenshots in One Snap",
+  "version": "1.2.0",
+  "description": "Capture, edit and save screenshots with ease",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "downloads",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["languages.js", "lib/html2canvas.min.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["languages.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
