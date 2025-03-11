@@ -6,6 +6,22 @@
 
 Snapix 是一款功能强大的浏览器截图扩展，让您轻松捕获、编辑和保存网页截图。无论是工作报告、学习笔记还是分享有趣内容，Snapix 都能满足您的需求。
 
+## 文档导航
+
+### 用户指南
+- [快速入门](user-guide/getting-started.html)
+- [基本功能](user-guide/basic-features.html)
+- [高级功能](user-guide/advanced-features.html)
+- [快捷键](user-guide/shortcuts.html)
+- [常见问题](faq/index.html)
+
+### 开发者指南
+- [架构概述](developer-guide/architecture.html)
+- [开发环境设置](developer-guide/setup.html)
+- [代码结构](developer-guide/code-structure.html)
+- [扩展API](api/index.html)
+- [贡献指南](https://github.com/LeoMusks/Snapix/blob/main/CONTRIBUTING.md)
+
 ## 主要功能
 
 - **多种截图模式**：可视区域、选择区域、整页截图
