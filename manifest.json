@@ -6,8 +6,7 @@
   "permissions": [
     "activeTab",
     "storage",
-    "downloads",
-    "scripting"
+    "downloads"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -21,7 +20,7 @@
     }
   },
   "background": {
-    "scripts": ["background.js"],
+    "service_worker": "background.js",
     "type": "module"
   },
   "browser_specific_settings": {

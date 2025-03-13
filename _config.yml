@@ -1,8 +1,0 @@
-theme: jekyll-theme-cayman
-title: Snapix - 一键截图工具
-description: 一款功能强大的浏览器截图扩展，让您轻松捕获、编辑和保存网页截图
-show_downloads: true
-google_analytics:
-github:
-  is_project_page: true
-  repository_url: https://github.com/LeoMusks/Snapix 
